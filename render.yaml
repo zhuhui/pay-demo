@@ -1,0 +1,21 @@
+# Render Deployment Configuration
+# 部署步骤：
+# 1. 访问 https://dashboard.render.com/
+# 2. 点击 "New +" → "Web Service"
+# 3. 连接 GitHub 仓库或选择 "Build and deploy from a Git repository"
+# 4. 选择本项目，配置如下：
+
+services:
+  - type: web
+    name: pdfmaster-api
+    runtime: docker
+    plan: free
+    rootDir: ./pdfmaster-service
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: PYTHON_VERSION
+        value: 3.11
+    healthCheckPath: /health
+    autoDeploy: true

@@ -1,0 +1,4 @@
+{
+  "/page": "app/page.js",
+  "/tools/merge-pdf/page": "app/tools/merge-pdf/page.js"
+}

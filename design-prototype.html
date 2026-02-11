@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Master - All-in-One PDF Tools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#6366F1',
+                        secondary: '#818CF8',
+                        cta: '#10B981',
+                        background: '#F5F3FF',
+                        text: '#1E1B4B',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F5F3FF;
+            color: #1E1B4B;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #6366F1 0%, #10B981 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .upload-zone {
+            border: 2px dashed #6366F1;
+            background: linear-gradient(135deg, #F5F3FF 0%, #EEF2FF 100%);
+            transition: all 0.2s ease;
+        }
+        .upload-zone:hover {
+            border-style: solid;
+            background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
+            transform: translateY(-2px);
+        }
+        .tool-card {
+            transition: all 0.2s ease;
+            border: 1px solid #E5E7EB;
+        }
+        .tool-card:hover {
+            border-color: #6366F1;
+            transform: translateY(-4px);
+            box-shadow: 0 10px 40px -10px rgba(99, 102, 241, 0.2);
+        }
+        .step-indicator {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 20px;
+        }
+        .pricing-card {
+            transition: all 0.3s ease;
+        }
+        .pricing-card:hover {
+            transform: translateY(-8px);
+        }
+        .pricing-card.popular {
+            border: 2px solid #6366F1;
+            position: relative;
+        }
+        .popular-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #6366F1;
+            color: white;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .faq-item {
+            border-bottom: 1px solid #E5E7EB;
+        }
+        .faq-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .faq-item.active .faq-content {
+            max-height: 200px;
+        }
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-100 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2">
+                    <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+                        <i class="fas fa-file-pdf text-white text-xl"></i>
+                    </div>
+                    <span class="text-xl font-bold text-text">PDF Master</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#tools" class="text-gray-600 hover:text-primary transition-colors">Tools</a>
+                    <a href="#pricing" class="text-gray-600 hover:text-primary transition-colors">Pricing</a>
+                    <a href="#faq" class="text-gray-600 hover:text-primary transition-colors">FAQ</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="text-gray-600 hover:text-primary transition-colors hidden sm:block">Sign In</button>
+                    <button class="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-secondary transition-all">
+                        Get Started
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-5xl mx-auto text-center">
+            <div class="inline-flex items-center space-x-2 bg-white px-4 py-2 rounded-full border border-gray-200 mb-8">
+                <span class="w-2 h-2 bg-cta rounded-full animate-pulse"></span>
+                <span class="text-sm text-gray-600">Free to use • No registration required</span>
+            </div>
+            
+            <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold text-text mb-6 leading-tight">
+                All-in-One<br>
+                <span class="gradient-text">PDF Tools</span>
+            </h1>
+            
+            <p class="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
+                Merge, split, compress, and convert PDFs online. 
+                Secure, fast, and completely free.
+            </p>
+
+            <!-- Upload Zone -->
+            <div class="upload-zone rounded-2xl p-8 sm:p-12 max-w-3xl mx-auto cursor-pointer mb-8">
+                <div class="w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-cloud-upload-alt text-primary text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-semibold text-text mb-3">Drop your PDF files here</h3>
+                <p class="text-gray-500 mb-6">or click to browse files</p>
+                <div class="flex flex-wrap justify-center gap-3 text-sm text-gray-400">
+                    <span class="flex items-center space-x-1">
+                        <i class="fas fa-check-circle text-cta"></i>
+                        <span>PDF</span>
+                    </span>
+                    <span class="flex items-center space-x-1">
+                        <i class="fas fa-check-circle text-cta"></i>
+                        <span>Word</span>
+                    </span>
+                    <span class="flex items-center space-x-1">
+                        <i class="fas fa-check-circle text-cta"></i>
+                        <span>Excel</span>
+                    </span>
+                    <span class="flex items-center space-x-1">
+                        <i class="fas fa-check-circle text-cta"></i>
+                        <span>PPT</span>
+                    </span>
+                </div>
+            </div>
+
+            <button class="bg-cta text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-emerald-600 transition-all transform hover:scale-105 shadow-lg shadow-emerald-500/30">
+                Start Free <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+    </section>
+
+    <!-- Tools Grid -->
+    <section id="tools" class="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-text mb-4">Popular PDF Tools</h2>
+                <p class="text-gray-600">Everything you need to work with PDFs</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Merge PDF -->
+                <div class="tool-card bg-white rounded-2xl p-8 cursor-pointer">
+                    <div class="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-object-group text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-text mb-2">Merge PDF</h3>
+                    <p class="text-gray-500 text-sm mb-4">Combine multiple PDFs into one document</p>
+                    <div class="flex items-center text-primary font-medium text-sm">
+                        <span>Use Tool</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </div>
+                </div>
+
+                <!-- Split PDF -->
+                <div class="tool-card bg-white rounded-2xl p-8 cursor-pointer">
+                    <div class="w-14 h-14 bg-orange-100 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-cut text-orange-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-text mb-2">Split PDF</h3>
+                    <p class="text-gray-500 text-sm mb-4">Separate pages or extract specific pages</p>
+                    <div class="flex items-center text-primary font-medium text-sm">
+                        <span>Use Tool</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </div>
+                </div>
+
+                <!-- Compress PDF -->
+                <div class="tool-card bg-white rounded-2xl p-8 cursor-pointer">
+                    <div class="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-compress-arrows-alt text-green-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-text mb-2">Compress PDF</h3>
+                    <p class="text-gray-500 text-sm mb-4">Reduce file size while maintaining quality</p>
+                    <div class="flex items-center text-primary font-medium text-sm">
+                        <span>Use Tool</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </div>
+                </div>
+
+                <!-- PDF to Image -->
+                <div class="tool-card bg-white rounded-2xl p-8 cursor-pointer">
+                    <div class="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-image text-purple-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-text mb-2">PDF to Image</h3>
+                    <p class="text-gray-500 text-sm mb-4">Convert PDF pages to JPG or PNG</p>
+                    <div class="flex items-center text-primary font-medium text-sm">
+                        <span>Use Tool</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </div>
+                </div>
+
+                <!-- Image to PDF -->
+                <div class="tool-card bg-white rounded-2xl p-8 cursor-pointer">
+                    <div class="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-file-image text-blue-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-text mb-2">Image to PDF</h3>
+                    <p class="text-gray-500 text-sm mb-4">Convert images to PDF documents</p>
+                    <div class="flex items-center text-primary font-medium text-sm">
+                        <span>Use Tool</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </div>
+                </div>
+
+                <!-- More Tools -->
+                <div class="tool-card bg-white rounded-2xl p-8 cursor-pointer border-dashed border-2">
+                    <div class="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center mb-6">
+                        <i class="fas fa-th-large text-gray-500 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-text mb-2">More Tools</h3>
+                    <p class="text-gray-500 text-sm mb-4">Explore 20+ PDF tools</p>
+                    <div class="flex items-center text-primary font-medium text-sm">
+                        <span>View All</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3-Step Funnel Section -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-text mb-4">How It Works</h2>
+                <p class="text-gray-600">Simple 3-step process</p>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Step 1 -->
+                <div class="bg-white rounded-2xl p-8 border-l-4 border-red-400">
+                    <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
+                        <div class="step-indicator bg-red-100 text-red-500">1</div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-semibold text-text mb-2">The Problem</h3>
+                            <p class="text-gray-600">PDF software is too expensive and complicated. Online tools have limits, watermarks, or security concerns.</p>
+                        </div>
+                        <i class="fas fa-exclamation-circle text-red-400 text-3xl hidden md:block"></i>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="bg-white rounded-2xl p-8 border-l-4 border-orange-400">
+                    <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
+                        <div class="step-indicator bg-orange-100 text-orange-500">2</div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-semibold text-text mb-2">Our Solution</h3>
+                            <p class="text-gray-600">100% free online tools. No installation needed. Process files instantly with bank-level security.</p>
+                        </div>
+                        <i class="fas fa-lightbulb text-orange-400 text-3xl hidden md:block"></i>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="bg-white rounded-2xl p-8 border-l-4 border-cta">
+                    <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
+                        <div class="step-indicator bg-green-100 text-cta">3</div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-semibold text-text mb-2">Take Action</h3>
+                            <p class="text-gray-600">Drag files, process with one click, download instantly. Files are automatically deleted after 1 hour.</p>
+                        </div>
+                        <i class="fas fa-check-circle text-cta text-3xl hidden md:block"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-10">
+                <button class="bg-cta text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-emerald-600 transition-all">
+                    Start Now <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Section -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-text mb-4">Why Choose PDF Master?</h2>
+                <p class="text-gray-600">See how we compare to alternatives</p>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+                <div class="grid grid-cols-3 gap-0">
+                    <div class="p-6 bg-gray-50 font-semibold text-text border-b border-gray-200">Feature</div>
+                    <div class="p-6 bg-primary/5 font-semibold text-primary border-b border-gray-200 text-center">PDF Master</div>
+                    <div class="p-6 bg-gray-50 font-semibold text-gray-500 border-b border-gray-200 text-center">Others</div>
+
+                    <div class="p-6 border-b border-gray-200">Free to Use</div>
+                    <div class="p-6 border-b border-gray-200 text-center"><i class="fas fa-check-circle text-cta text-2xl"></i></div>
+                    <div class="p-6 border-b border-gray-200 text-center"><i class="fas fa-times-circle text-gray-300 text-2xl"></i></div>
+
+                    <div class="p-6 border-b border-gray-200">No Watermark</div>
+                    <div class="p-6 border-b border-gray-200 text-center"><i class="fas fa-check-circle text-cta text-2xl"></i></div>
+                    <div class="p-6 border-b border-gray-200 text-center"><i class="fas fa-times-circle text-gray-300 text-2xl"></i></div>
+
+                    <div class="p-6 border-b border-gray-200">Privacy & Security</div>
+                    <div class="p-6 border-b border-gray-200 text-center"><i class="fas fa-check-circle text-cta text-2xl"></i></div>
+                    <div class="p-6 border-b border-gray-200 text-center"><i class="fas fa-question-circle text-gray-300 text-2xl"></i></div>
+
+                    <div class="p-6 border-b border-gray-200">Fast Processing</div>
+                    <div class="p-6 border-b border-gray-200 text-center"><i class="fas fa-check-circle text-cta text-2xl"></i></div>
+                    <div class="p-6 border-b border-gray-200 text-center"><i class="fas fa-clock text-gray-300 text-2xl"></i></div>
+
+                    <div class="p-6">No Registration</div>
+                    <div class="p-6 text-center"><i class="fas fa-check-circle text-cta text-2xl"></i></div>
+                    <div class="p-6 text-center"><i class="fas fa-times-circle text-gray-300 text-2xl"></i></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-text mb-4">Simple Pricing</h2>
+                <p class="text-gray-600">Start free, upgrade when you need more</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Free Plan -->
+                <div class="pricing-card bg-white rounded-2xl p-8 border border-gray-200">
+                    <div class="text-center mb-8">
+                        <h3 class="text-xl font-semibold text-text mb-2">Free</h3>
+                        <div class="text-4xl font-bold text-text mb-2">$0</div>
+                        <p class="text-gray-500 text-sm">Forever free</p>
+                    </div>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-cta"></i>
+                            <span class="text-gray-600">3 tasks per day</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-cta"></i>
+                            <span class="text-gray-600">Max 10MB file size</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-cta"></i>
+                            <span class="text-gray-600">Basic features</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-cta"></i>
+                            <span class="text-gray-600">Standard support</span>
+                        </li>
+                    </ul>
+                    <button class="w-full py-3 border-2 border-primary text-primary rounded-xl font-semibold hover:bg-primary hover:text-white transition-all">
+                        Get Started
+                    </button>
+                </div>
+
+                <!-- Pro Plan -->
+                <div class="pricing-card popular bg-white rounded-2xl p-8">
+                    <div class="popular-badge">MOST POPULAR</div>
+                    <div class="text-center mb-8">
+                        <h3 class="text-xl font-semibold text-text mb-2">Pro</h3>
+                        <div class="text-4xl font-bold text-text mb-2">$9.9</div>
+                        <p class="text-gray-500 text-sm">per month</p>
+                    </div>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-cta"></i>
+                            <span class="text-gray-600">Unlimited tasks</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-cta"></i>
+                            <span class="text-gray-600">Max 100MB file size</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-cta"></i>
+                            <span class="text-gray-600">All features</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-cta"></i>
+                            <span class="text-gray-600">Priority support</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-cta"></i>
+                            <span class="text-gray-600">No ads</span>
+                        </li>
+                    </ul>
+                    <button class="w-full py-3 bg-primary text-white rounded-xl font-semibold hover:bg-secondary transition-all">
+                        Upgrade to Pro
+                    </button>
+                </div>
+
+                <!-- Business Plan -->
+                <div class="pricing-card bg-white rounded-2xl p-8 border border-gray-200">
+                    <div class="text-center mb-8">
+                        <h3 class="text-xl font-semibold text-text mb-2">Business</h3>
+                        <div class="text-4xl font-bold text-text mb-2">$29</div>
+                        <p class="text-gray-500 text-sm">per month</p>
+                    </div>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-cta"></i>
+                            <span class="text-gray-600">Unlimited everything</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-cta"></i>
+                            <span class="text-gray-600">Max 500MB file size</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-cta"></i>
+                            <span class="text-gray-600">API access</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-cta"></i>
+                            <span class="text-gray-600">Dedicated support</span>
+                        </li>
+                        <li class="flex items-center space-x-3">
+                            <i class="fas fa-check text-cta"></i>
+                            <span class="text-gray-600">Team collaboration</span>
+                        </li>
+                    </ul>
+                    <button class="w-full py-3 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:border-primary hover:text-primary transition-all">
+                        Contact Sales
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-text mb-4">Frequently Asked Questions</h2>
+                <p class="text-gray-600">Everything you need to know</p>
+            </div>
+
+            <div class="space-y-0">
+                <div class="faq-item py-6">
+                    <button class="faq-toggle w-full flex items-center justify-between text-left">
+                        <span class="text-lg font-medium text-text">Is PDF Master free to use?</span>
+                        <i class="faq-icon fas fa-chevron-down text-gray-400 transition-transform"></i>
+                    </button>
+                    <div class="faq-content">
+                        <p class="text-gray-600 pt-4">Yes! Our free plan includes 3 tasks per day with files up to 10MB. No credit card required, no hidden fees.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item py-6">
+                    <button class="faq-toggle w-full flex items-center justify-between text-left">
+                        <span class="text-lg font-medium text-text">Are my files secure?</span>
+                        <i class="faq-icon fas fa-chevron-down text-gray-400 transition-transform"></i>
+                    </button>
+                    <div class="faq-content">
+                        <p class="text-gray-600 pt-4">Absolutely. All file transfers use SSL encryption. Files are automatically deleted from our servers after 1 hour. We never access or share your content.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item py-6">
+                    <button class="faq-toggle w-full flex items-center justify-between text-left">
+                        <span class="text-lg font-medium text-text">What file formats are supported?</span>
+                        <i class="faq-icon fas fa-chevron-down text-gray-400 transition-transform"></i>
+                    </button>
+                    <div class="faq-content">
+                        <p class="text-gray-600 pt-4">We support PDF, Word (DOC/DOCX), Excel (XLS/XLSX), PowerPoint (PPT/PPTX), and image formats (JPG, PNG). You can convert between most formats.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item py-6">
+                    <button class="faq-toggle w-full flex items-center justify-between text-left">
+                        <span class="text-lg font-medium text-text">Do I need to create an account?</span>
+                        <i class="faq-icon fas fa-chevron-down text-gray-400 transition-transform"></i>
+                    </button>
+                    <div class="faq-content">
+                        <p class="text-gray-600 pt-4">No account needed for the free plan. Simply visit our website and start processing files immediately. Optional signup for Pro features.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item py-6">
+                    <button class="faq-toggle w-full flex items-center justify-between text-left">
+                        <span class="text-lg font-medium text-text">Can I cancel my subscription anytime?</span>
+                        <i class="faq-icon fas fa-chevron-down text-gray-400 transition-transform"></i>
+                    </button>
+                    <div class="faq-content">
+                        <p class="text-gray-600 pt-4">Yes, you can cancel your subscription at any time with no questions asked. You'll continue to have access until the end of your billing period.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="bg-primary rounded-3xl p-12 text-white">
+                <h2 class="text-4xl font-bold mb-4">Ready to Get Started?</h2>
+                <p class="text-xl text-white/80 mb-8">Join millions of users who trust PDF Master for their document needs.</p>
+                <button class="bg-cta text-white px-8 py-4 rounded-xl font-semibold text-lg hover:bg-emerald-600 transition-all transform hover:scale-105">
+                    Start Free Now <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+                <p class="text-sm text-white/60 mt-4">No credit card required • Free forever plan available</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                            <i class="fas fa-file-pdf text-white text-sm"></i>
+                        </div>
+                        <span class="text-lg font-bold text-text">PDF Master</span>
+                    </div>
+                    <p class="text-gray-500 text-sm">Free online PDF tools for everyone. Simple, secure, and fast.</p>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold text-text mb-4">Tools</h4>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li><a href="#" class="hover:text-primary">Merge PDF</a></li>
+                        <li><a href="#" class="hover:text-primary">Split PDF</a></li>
+                        <li><a href="#" class="hover:text-primary">Compress PDF</a></li>
+                        <li><a href="#" class="hover:text-primary">All Tools</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-text mb-4">Company</h4>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li><a href="#" class="hover:text-primary">About</a></li>
+                        <li><a href="#" class="hover:text-primary">Blog</a></li>
+                        <li><a href="#" class="hover:text-primary">Careers</a></li>
+                        <li><a href="#" class="hover:text-primary">Contact</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-text mb-4">Legal</h4>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li><a href="#" class="hover:text-primary">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-primary">Terms of Service</a></li>
+                        <li><a href="#" class="hover:text-primary">Security</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-500 text-sm">© 2026 PDF Master. All rights reserved.</p>
+                <div class="flex space-x-4 mt-4 md:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-primary"><i class="fab fa-twitter text-xl"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-primary"><i class="fab fa-github text-xl"></i></a>
+                    <a href="#" class="text-gray-400 hover:text-primary"><i class="fab fa-linkedin text-xl"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // FAQ Accordion
+        document.querySelectorAll('.faq-toggle').forEach(button => {
+            button.addEventListener('click', () => {
+                const item = button.parentElement;
+                item.classList.toggle('active');
+            });
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

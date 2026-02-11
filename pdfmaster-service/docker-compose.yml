@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  pdfmaster-api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - TEMP_DIR=/tmp/pdfmaster
+    volumes:
+      - /tmp/pdfmaster:/tmp/pdfmaster
+    restart: unless-stopped
