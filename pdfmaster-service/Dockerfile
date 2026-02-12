@@ -23,4 +23,5 @@ RUN mkdir -p /tmp/pdfmaster
 EXPOSE 8000
 
 # Run application with dynamic port from environment variable
+# Force rebuild with PORT env var support
 CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
