@@ -13,15 +13,15 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# Copy application code and startup script
 COPY main.py .
+COPY start.sh .
 
 # Create temp directory
-RUN mkdir -p /tmp/pdfmaster
+RUN mkdir -p /tmp/pdfmaster && chmod +x start.sh
 
 # Expose port
 EXPOSE 8000
 
 # Run application with dynamic port from environment variable
-# Force rebuild with PORT env var support
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["./start.sh"]
