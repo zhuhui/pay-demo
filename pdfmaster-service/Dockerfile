@@ -15,13 +15,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code and startup script
 COPY main.py .
-COPY start.sh .
+COPY start.py .
 
 # Create temp directory
-RUN mkdir -p /tmp/pdfmaster && chmod +x start.sh
+RUN mkdir -p /tmp/pdfmaster && chmod +x start.py
 
 # Expose port
 EXPOSE 8000
 
 # Run application with dynamic port from environment variable
-CMD ["./start.sh"]
+CMD ["python3", "start.py"]
