@@ -1,0 +1,11 @@
+{
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/page": "app/page.js",
+  "/tools/image/compress/page": "app/tools/image/compress/page.js",
+  "/tools/image/convert/page": "app/tools/image/convert/page.js",
+  "/tools/image/resize/page": "app/tools/image/resize/page.js",
+  "/tools/merge-pdf/page": "app/tools/merge-pdf/page.js",
+  "/tools/page": "app/tools/page.js",
+  "/tools/pdf/compress/page": "app/tools/pdf/compress/page.js"
+}

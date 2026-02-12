@@ -1,0 +1,11 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/page": "/",
+  "/tools/image/compress/page": "/tools/image/compress",
+  "/tools/image/convert/page": "/tools/image/convert",
+  "/tools/image/resize/page": "/tools/image/resize",
+  "/tools/merge-pdf/page": "/tools/merge-pdf",
+  "/tools/page": "/tools",
+  "/tools/pdf/compress/page": "/tools/pdf/compress"
+}

@@ -1,0 +1,3 @@
+module.exports=[47541,a=>{"use strict";var b=a.i(33118);function c({children:a}){return(0,b.jsxs)("html",{lang:"en",children:[(0,b.jsxs)("head",{children:[(0,b.jsx)("link",{href:"https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap",rel:"stylesheet"}),(0,b.jsx)("link",{rel:"stylesheet",href:"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"})]}),(0,b.jsx)("body",{className:"antialiased",children:a})]})}a.s(["default",()=>c,"metadata",0,{title:"PDF Master - All-in-One PDF Tools",description:"Free online PDF tools. Merge, split, compress, and convert PDFs online. Secure, fast, and completely free."}])}];
+
+//# sourceMappingURL=pdfmaster_app_layout_tsx_94cae372._.js.map
