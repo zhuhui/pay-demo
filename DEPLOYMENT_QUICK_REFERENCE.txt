@@ -1,0 +1,202 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                   PDF MASTER - 云端部署快速参考卡                              ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+📦 项目信息
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  GitHub: https://github.com/zhuhui/pay-demo
+  分支:    main
+  代码状态: ✅ 已推送并准备部署
+
+
+🚀 部署流程 (总时间: 20-30分钟)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+【步骤1】部署后端到 Railway (5-10分钟)
+  1. 打开: https://railway.app
+  2. 登录: GitHub 账号
+  3. 创建: New Project → Deploy from GitHub
+  4. 选择: pay-demo 仓库
+  5. 配置: Root Directory = pdfmaster-service
+  6. 部署: 点击 Deploy 按钮
+  7. 等待: 构建完成 (2-3分钟)
+  8. 记录: Railway URL
+     例如: https://pdfmaster-api-xxxx.railway.app
+
+  ✅ 验证:
+     curl https://pdfmaster-api-xxxx.railway.app/health
+     返回: {"status":"healthy"}
+
+
+【步骤2】部署前端到 Vercel (3-5分钟)
+  1. 打开: https://vercel.com
+  2. 登录: GitHub 账号
+  3. 创建: Add New Project → Import Project
+  4. 选择: pay-demo 仓库
+  5. 配置:
+     - Root Directory: pdfmaster
+     - Framework: Next.js
+  6. 环境变量 (重要!):
+     - Name: NEXT_PUBLIC_API_URL
+     - Value: 你的 Railway URL (例: https://pdfmaster-api-xxxx.railway.app)
+     - 点击: Add
+  7. 部署: 点击 Deploy 按钮
+  8. 等待: 构建完成 (1-2分钟)
+  9. 记录: Vercel URL
+     例如: https://pdfmaster-xyz789.vercel.app
+
+  ✅ 验证:
+     打开: https://pdfmaster-xyz789.vercel.app
+     应该看到: PDF Master 主页
+
+
+【步骤3】测试应用 (5分钟)
+  1. 打开网站: https://pdfmaster-xyz789.vercel.app
+  2. 尝试合并 PDF: 上传2个PDF文件
+  3. 尝试压缩图片: 上传一张图片
+  4. 检查浏览器 DevTools (F12) 网络标签是否有错误
+
+
+📊 部署链接
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  前端网站:      https://pdfmaster-____________.vercel.app
+  后端 API:      https://pdfmaster-api-________.railway.app
+  API 文档:      https://pdfmaster-api-________.railway.app/docs
+  API 健康检查:  https://pdfmaster-api-________.railway.app/health
+
+
+🛠️ 重要配置
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  【必须】Vercel 环境变量:
+    NEXT_PUBLIC_API_URL = https://pdfmaster-api-xxxx.railway.app
+    
+  【可选】Railway 环境变量:
+    PORT = 8000
+    PYTHON_VERSION = 3.11
+
+  ⚠️  注意: URL 末尾不要加 /
+
+
+⚡ 快速故障排除
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  问题                          解决方案
+  ─────────────────────────────────────────────────────────────
+  Railway 部署失败               查看 Railway Logs, 重新部署
+  Vercel 无法连接后端            检查 NEXT_PUBLIC_API_URL 环境变量
+  网站打开但无法上传文件          确认 Railway 后端已完全部署
+  部署太慢                       正常情况, 第一次需要 5-15分钟
+
+
+📱 API 端点
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  PDF 处理:
+    POST /api/v1/pdf/merge       - 合并 PDF
+    POST /api/v1/pdf/compress    - 压缩 PDF
+    POST /api/v1/pdf/info        - 获取 PDF 信息
+    POST /api/v1/pdf/split       - 拆分 PDF (TODO)
+
+  图片处理:
+    POST /api/v1/image/compress  - 压缩图片
+    POST /api/v1/image/resize    - 缩放图片
+    POST /api/v1/image/convert   - 格式转换
+
+  系统:
+    GET  /                       - 服务信息
+    GET  /health                 - 健康检查
+    GET  /docs                   - API 文档 (Swagger)
+
+
+💻 本地测试 (可选)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  【后端】:
+    cd pdfmaster-service
+    python -m pip install -r requirements.txt
+    python main.py
+    # 打开: http://localhost:8000/docs
+
+  【前端】:
+    cd pdfmaster
+    npm install
+    NEXT_PUBLIC_API_URL=http://localhost:8000 npm run dev
+    # 打开: http://localhost:3000
+
+
+📚 文档位置
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  快速部署 (推荐首先阅读):
+    → QUICK_START_DEPLOY.md
+
+  完整检查清单 (部署时参考):
+    → DEPLOYMENT_CHECKLIST.md
+
+  详细部署指南 (遇到问题时查看):
+    → DEPLOYMENT_VERCEL_RAILWAY.md
+
+  部署总结 (概览信息):
+    → DEPLOYMENT_SUMMARY.md
+
+
+💰 成本
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Railway:     ₽0 (500运行小时/月免费)
+  Vercel:      ₽0 (免费额度充足)
+  域名:        可选 (₽10-30/年)
+  ─────────────────────────────────────
+  总计:        ₽0 (完全免费)
+
+
+✅ 部署准备检查清单
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  部署前:
+    ☐ 代码已推送到 GitHub (已完成 ✅)
+    ☐ 拥有 Railway 账号 (或用 GitHub 登录)
+    ☐ 拥有 Vercel 账号 (或用 GitHub 登录)
+    ☐ 网络连接正常
+
+  部署中:
+    ☐ Railway 后端部署成功
+    ☐ Vercel 前端环境变量已配置
+    ☐ Vercel 前端部署成功
+
+  部署后:
+    ☐ 后端可访问 /health 端点
+    ☐ 前端主页加载正常
+    ☐ 网站可以上传文件
+
+
+🎯 下一步
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  部署完成后:
+    1. 分享你的部署链接给朋友
+    2. 收集反馈和问题报告
+    3. 监控 Railway 和 Vercel 面板
+
+  本周计划:
+    1. 实现 API Key 认证
+    2. 配置 Cloudflare R2 存储
+    3. 完成 PDF 拆分功能
+
+  长期计划:
+    1. 配置自定义域名
+    2. 添加更多文件处理功能
+    3. 实现商业化计划
+
+
+═════════════════════════════════════════════════════════════════════════════════
+
+现在开始部署! 按照以上步骤,预计 20-30 分钟内应用上线。
+
+有问题? 查看详细指南:
+  → QUICK_START_DEPLOY.md
+  → DEPLOYMENT_CHECKLIST.md
+
+═════════════════════════════════════════════════════════════════════════════════
