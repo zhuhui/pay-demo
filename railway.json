@@ -1,0 +1,9 @@
+{
+  "$schema": "https://railway.app/schema.json",
+  "build": {
+    "dockerfile": "pdfmaster-service/Dockerfile"
+  },
+  "deploy": {
+    "startCommand": "python3 pdfmaster-service/start.py"
+  }
+}
