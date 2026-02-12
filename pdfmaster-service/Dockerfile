@@ -2,6 +2,10 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
+# Add build timestamp to prevent caching
+ARG BUILD_DATE=unknown
+ENV BUILD_DATE=${BUILD_DATE}
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     libmagic1 \
