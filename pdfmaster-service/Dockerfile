@@ -9,6 +9,7 @@ ENV BUILD_DATE=${BUILD_DATE}
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     libmagic1 \
+    poppler-utils \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements

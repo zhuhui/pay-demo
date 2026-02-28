@@ -147,17 +147,109 @@ async def merge_pdfs(files: List[UploadFile] = File(...)):
 @app.post("/api/v1/pdf/split")
 async def split_pdf(
     file: UploadFile = File(...),
-    pages: Optional[str] = None,  # 例如: "1,3,5-10"
+    pages: Optional[str] = Form(None),  # 例如: "1,3,5-10"
+    split_mode: Optional[str] = Form("single"),  # single, all, range
 ):
     """
     Split PDF by pages
 
     - **file**: PDF file to split
-    - **pages**: Page ranges (e.g., "1,3,5-10"). If not provided, splits all pages
+    - **pages**: Page ranges (e.g., "1,3,5-10"). Only for 'range' mode
+    - **split_mode**: 'single' (extract specific pages), 'all' (each page separate), 'range' (custom ranges)
     - Returns: ZIP file containing split PDFs
     """
-    # TODO: 实现拆分逻辑
-    pass
+    try:
+        logger.info(
+            f"Splitting PDF: {file.filename}, mode: {split_mode}, pages: {pages}"
+        )
+
+        if not file.content_type or "pdf" not in file.content_type:
+            raise HTTPException(status_code=400, detail="File must be a PDF")
+
+        content = await file.read()
+        reader = PdfReader(BytesIO(content))
+        total_pages = len(reader.pages)
+
+        if total_pages == 0:
+            raise HTTPException(status_code=400, detail="PDF has no pages")
+
+        writer = PdfWriter()
+        output_files = []
+
+        def parse_pages(page_str: str, total: int) -> List[int]:
+            result = []
+            parts = page_str.split(",")
+            for part in parts:
+                part = part.strip()
+                if "-" in part:
+                    start, end = part.split("-")
+                    result.extend(range(int(start) - 1, int(end)))
+                else:
+                    result.append(int(part) - 1)
+            return [p for p in result if 0 <= p < total]
+
+        if split_mode == "all":
+            for i in range(total_pages):
+                writer = PdfWriter()
+                writer.add_page(reader.pages[i])
+                output_id = str(uuid.uuid4())
+                output_path = os.path.join(TEMP_DIR, f"page_{i + 1}_{output_id}.pdf")
+                with open(output_path, "wb") as f:
+                    writer.write(f)
+                output_files.append((f"page_{i + 1}.pdf", output_path))
+
+        elif split_mode == "range" and pages:
+            parsed_pages = parse_pages(pages, total_pages)
+            if not parsed_pages:
+                raise HTTPException(status_code=400, detail="Invalid page range")
+
+            writer = PdfWriter()
+            for page_num in parsed_pages:
+                writer.add_page(reader.pages[page_num])
+
+            output_id = str(uuid.uuid4())
+            output_path = os.path.join(TEMP_DIR, f"split_{output_id}.pdf")
+            with open(output_path, "wb") as f:
+                writer.write(f)
+            output_files.append((f"split_pages_{pages}.pdf", output_path))
+
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid mode. Use 'all' to split all pages, or 'range' with pages parameter",
+            )
+
+        if not output_files:
+            raise HTTPException(status_code=400, detail="No pages to export")
+
+        if len(output_files) == 1:
+            return FileResponse(
+                output_files[0][1],
+                filename=output_files[0][0],
+                media_type="application/pdf",
+            )
+
+        import zipfile
+
+        zip_id = str(uuid.uuid4())
+        zip_path = os.path.join(TEMP_DIR, f"split_{zip_id}.zip")
+
+        with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+            for filename, filepath in output_files:
+                zipf.write(filepath, filename)
+
+        return FileResponse(
+            zip_path,
+            filename="split_pages.zip",
+            media_type="application/zip",
+            headers={"X-Total-Files": str(len(output_files))},
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error splitting PDF: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Split failed: {str(e)}")
 
 
 @app.post("/api/v1/pdf/compress")
@@ -193,9 +285,6 @@ async def compress_pdf(
         # 压缩内容流
         for page in writer.pages:
             page.compress_content_streams()
-
-        # 移除重复对象
-        writer.compress_identical_objects(remove_identicals=True, remove_orphans=True)
 
         # 生成输出文件
         output_id = str(uuid.uuid4())
@@ -532,6 +621,192 @@ async def convert_image(
         raise HTTPException(
             status_code=500, detail=f"Image conversion failed: {str(e)}"
         )
+
+
+@app.post("/api/v1/pdf/to-jpg")
+async def pdf_to_jpg(
+    file: UploadFile = File(...),
+    dpi: Optional[int] = Form(150),
+    format: Optional[str] = Form("jpg"),
+):
+    """
+    Convert PDF pages to images
+
+    - **file**: PDF file to convert
+    - **dpi**: Image resolution (default: 150)
+    - **format**: Output format (jpg, png)
+    - Returns: ZIP file containing images
+    """
+    try:
+        try:
+            from pdf2image import convert_from_bytes
+        except ImportError:
+            raise HTTPException(
+                status_code=500,
+                detail="PDF to image conversion not available. Please install pdf2image and poppler.",
+            )
+
+        logger.info(f"Converting PDF to JPG: {file.filename}, DPI: {dpi}")
+
+        if not file.content_type or "pdf" not in file.content_type:
+            raise HTTPException(status_code=400, detail="File must be a PDF")
+
+        content = await file.read()
+        images = convert_from_bytes(content, dpi=dpi)
+
+        if not images:
+            raise HTTPException(
+                status_code=400, detail="Could not extract pages from PDF"
+            )
+
+        import zipfile
+        import io
+
+        zip_id = str(uuid.uuid4())
+        zip_path = os.path.join(TEMP_DIR, f"pdf_images_{zip_id}.zip")
+
+        output_format = format.lower() if format else "jpg"
+        if output_format not in ["jpg", "jpeg", "png"]:
+            output_format = "jpg"
+
+        with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+            for i, image in enumerate(images):
+                img_buffer = io.BytesIO()
+                if output_format in ["jpg", "jpeg"]:
+                    image = image.convert("RGB")
+                    image.save(img_buffer, format="JPEG", quality=95)
+                    ext = "jpg"
+                else:
+                    image.save(img_buffer, format="PNG")
+                    ext = "png"
+
+                img_buffer.seek(0)
+                zipf.writestr(f"page_{i + 1}.{ext}", img_buffer.read())
+
+        logger.info(f"PDF converted to {len(images)} images")
+
+        return FileResponse(
+            zip_path,
+            filename="pdf_images.zip",
+            media_type="application/zip",
+            headers={"X-Total-Pages": str(len(images))},
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error converting PDF to JPG: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Conversion failed: {str(e)}")
+
+
+@app.post("/api/v1/pdf/from-jpg")
+async def jpg_to_pdf(
+    files: List[UploadFile] = File(...),
+):
+    """
+    Convert images to PDF
+
+    - **files**: List of image files (JPG, PNG, etc.)
+    - Returns: Combined PDF file
+    """
+    try:
+        logger.info(f"Converting {len(files)} images to PDF")
+
+        if len(files) < 1:
+            raise HTTPException(status_code=400, detail="At least 1 image required")
+
+        images = []
+        for file in files:
+            content = await file.read()
+            img = Image.open(BytesIO(content))
+            if img.mode == "RGBA":
+                background = Image.new("RGB", img.size, (255, 255, 255))
+                background.paste(img, mask=img.split()[3])
+                img = background
+            elif img.mode != "RGB":
+                img = img.convert("RGB")
+            images.append(img)
+
+        if not images:
+            raise HTTPException(status_code=400, detail="Could not process images")
+
+        output_id = str(uuid.uuid4())
+        output_path = os.path.join(TEMP_DIR, f"images_{output_id}.pdf")
+
+        images[0].save(
+            output_path,
+            save_all=True,
+            append_images=images[1:],
+            resolution=100.0,
+            quality=95,
+        )
+
+        logger.info(f"PDF created with {len(images)} pages")
+
+        return FileResponse(
+            output_path,
+            filename="converted.pdf",
+            media_type="application/pdf",
+            headers={"X-Total-Pages": str(len(images))},
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error converting JPG to PDF: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Conversion failed: {str(e)}")
+
+
+@app.post("/api/v1/pdf/to-word")
+async def pdf_to_word(
+    file: UploadFile = File(...),
+):
+    """
+    Convert PDF to Word document
+
+    - **file**: PDF file to convert
+    - Returns: Word document (.docx)
+    """
+    try:
+        try:
+            from pdf2docx import Converter
+        except ImportError:
+            raise HTTPException(
+                status_code=500,
+                detail="PDF to Word conversion not available. Please install pdf2docx.",
+            )
+
+        logger.info(f"Converting PDF to Word: {file.filename}")
+
+        if not file.content_type or "pdf" not in file.content_type:
+            raise HTTPException(status_code=400, detail="File must be a PDF")
+
+        content = await file.read()
+        input_path = os.path.join(TEMP_DIR, f"input_{uuid.uuid4()}.pdf")
+        output_path = os.path.join(TEMP_DIR, f"output_{uuid.uuid4()}.docx")
+
+        with open(input_path, "wb") as f:
+            f.write(content)
+
+        cv = Converter(input_path)
+        cv.convert(output_path)
+        cv.close()
+
+        os.remove(input_path)
+
+        logger.info("PDF converted to Word")
+
+        return FileResponse(
+            output_path,
+            filename=f"{os.path.splitext(file.filename)[0]}.docx",
+            media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error converting PDF to Word: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Conversion failed: {str(e)}")
 
 
 if __name__ == "__main__":
