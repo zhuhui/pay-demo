@@ -809,6 +809,114 @@ async def pdf_to_word(
         raise HTTPException(status_code=500, detail=f"Conversion failed: {str(e)}")
 
 
+@app.post("/api/v1/pdf/protect")
+async def protect_pdf(
+    file: UploadFile = File(...),
+    password: Optional[str] = Form(None),
+):
+    """
+    Add password protection to PDF
+
+    - **file**: PDF file to protect
+    - **password**: Password to set
+    - Returns: Protected PDF file
+    """
+    try:
+        from pypdf import PdfWriter
+
+        logger.info(f"Protecting PDF: {file.filename}")
+
+        if not file.content_type or "pdf" not in file.content_type:
+            raise HTTPException(status_code=400, detail="File must be a PDF")
+
+        if not password:
+            raise HTTPException(status_code=400, detail="Password is required")
+
+        content = await file.read()
+        reader = PdfReader(BytesIO(content))
+        writer = PdfWriter()
+
+        for page in reader.pages:
+            writer.add_page(page)
+
+        writer.encrypt(password)
+
+        output_id = str(uuid.uuid4())
+        output_path = os.path.join(TEMP_DIR, f"protected_{output_id}.pdf")
+
+        with open(output_path, "wb") as output_file:
+            writer.write(output_file)
+
+        logger.info(f"PDF protected: {file.filename}")
+
+        return FileResponse(
+            output_path,
+            filename=f"protected_{file.filename}",
+            media_type="application/pdf",
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error protecting PDF: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Protection failed: {str(e)}")
+
+
+@app.post("/api/v1/pdf/unlock")
+async def unlock_pdf(
+    file: UploadFile = File(...),
+    password: Optional[str] = Form(None),
+):
+    """
+    Remove password protection from PDF
+
+    - **file**: PDF file to unlock
+    - **password**: Current password
+    - Returns: Unlocked PDF file
+    """
+    try:
+        from pypdf import PdfReader, PdfWriter
+
+        logger.info(f"Unlocking PDF: {file.filename}")
+
+        if not file.content_type or "pdf" not in file.content_type:
+            raise HTTPException(status_code=400, detail="File must be a PDF")
+
+        if not password:
+            raise HTTPException(status_code=400, detail="Password is required")
+
+        content = await file.read()
+        reader = PdfReader(BytesIO(content))
+
+        if reader.is_encrypted:
+            reader.decrypt(password)
+
+        writer = PdfWriter()
+
+        for page in reader.pages:
+            writer.add_page(page)
+
+        output_id = str(uuid.uuid4())
+        output_path = os.path.join(TEMP_DIR, f"unlocked_{output_id}.pdf")
+
+        with open(output_path, "wb") as output_file:
+            writer.write(output_file)
+
+        logger.info(f"PDF unlocked: {file.filename}")
+
+        return FileResponse(
+            output_path,
+            filename=f"unlocked_{file.filename}",
+            media_type="application/pdf",
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error unlocking PDF: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Unlock failed: {str(e)}")
+
+
 if __name__ == "__main__":
     import uvicorn
 

@@ -19,14 +19,16 @@ const toolCategories = [
       { name: "Compress PDF", desc: "Reduce file size", icon: "fa-compress-arrows-alt", href: "/tools/pdf/compress" },
       { name: "PDF to Word", desc: "Convert to editable DOC", icon: "fa-file-word", href: "/tools/pdf/to-word" },
       { name: "Split PDF", desc: "Extract pages", icon: "fa-cut", href: "/tools/pdf/split" },
+      { name: "Protect PDF", desc: "Add password", icon: "fa-lock", href: "/tools/pdf/protect" },
+      { name: "Unlock PDF", desc: "Remove password", icon: "fa-unlock", href: "/tools/pdf/unlock" },
     ],
     tools: [
-      { name: "PDF to JPG", href: "/tools/pdf/to-jpg" },
-      { name: "JPG to PDF", href: "/tools/pdf/from-jpg" },
-      { name: "PDF to Excel", href: "/tools/pdf/to-excel" },
-      { name: "PDF to PPT", href: "/tools/pdf/to-ppt" },
-      { name: "Protect PDF", href: "/tools/pdf/protect" },
-      { name: "Unlock PDF", href: "/tools/pdf/unlock" },
+      { name: "PDF to JPG", desc: "Convert to images", icon: "fa-file-image", href: "/tools/pdf/to-jpg" },
+      { name: "JPG to PDF", desc: "Images to PDF", icon: "fa-file-pdf", href: "/tools/pdf/from-jpg" },
+      { name: "PDF to Excel", desc: "Convert to spreadsheet", icon: "fa-file-excel", href: "/tools/pdf/to-excel" },
+      { name: "PDF to PPT", desc: "Convert to slides", icon: "fa-file-powerpoint", href: "/tools/pdf/to-ppt" },
+      { name: "Protect PDF", desc: "Add password", icon: "fa-lock", href: "/tools/pdf/protect" },
+      { name: "Unlock PDF", desc: "Remove password", icon: "fa-unlock", href: "/tools/pdf/unlock" },
     ],
   },
   {
@@ -43,12 +45,12 @@ const toolCategories = [
       { name: "Crop Image", desc: "Crop to size", icon: "fa-crop", href: "/tools/image/crop" },
     ],
     tools: [
-      { name: "Remove Background", href: "/tools/image/remove-bg" },
-      { name: "Image to PDF", href: "/tools/image/to-pdf" },
-      { name: "Rotate Image", href: "/tools/image/rotate" },
-      { name: "Add Watermark", href: "/tools/image/watermark" },
-      { name: "Blur Background", href: "/tools/image/blur-bg" },
-      { name: "All Image Tools", href: "/tools/image" },
+      { name: "Remove Background", desc: "AI background removal", icon: "fa-magic", href: "/tools/image/remove-bg" },
+      { name: "Image to PDF", desc: "Convert to PDF", icon: "fa-file-pdf", href: "/tools/image/to-pdf" },
+      { name: "Rotate Image", desc: "Rotate & flip", icon: "fa-redo", href: "/tools/image/rotate" },
+      { name: "Add Watermark", desc: "Text or image", icon: "fa-tint", href: "/tools/image/watermark" },
+      { name: "Blur Background", desc: "Blur effect", icon: "fa-blur", href: "/tools/image/blur-bg" },
+      { name: "All Image Tools", desc: "View all tools", icon: "fa-th", href: "/tools/image" },
     ],
   },
   {
@@ -65,12 +67,12 @@ const toolCategories = [
       { name: "MP4 to MP3", desc: "Extract audio", icon: "fa-headphones", href: "/tools/video/mp4-to-mp3" },
     ],
     tools: [
-      { name: "Video to WebP", href: "/tools/video/to-webp" },
-      { name: "Resize Video", href: "/tools/video/resize" },
-      { name: "Merge Videos", href: "/tools/video/merge" },
-      { name: "Rotate Video", href: "/tools/video/rotate" },
-      { name: "Add Watermark", href: "/tools/video/watermark" },
-      { name: "All Video Tools", href: "/tools/video" },
+      { name: "Video to WebP", desc: "Convert video format", icon: "fa-file-video", href: "/tools/video/to-webp" },
+      { name: "Resize Video", desc: "Change dimensions", icon: "fa-expand", href: "/tools/video/resize" },
+      { name: "Merge Videos", desc: "Combine videos", icon: "fa-object-group", href: "/tools/video/merge" },
+      { name: "Rotate Video", desc: "Rotate video", icon: "fa-redo", href: "/tools/video/rotate" },
+      { name: "Add Watermark", desc: "Add text/image", icon: "fa-tint", href: "/tools/video/watermark" },
+      { name: "All Video Tools", desc: "View all tools", icon: "fa-th", href: "/tools/video" },
     ],
   },
   {
@@ -87,12 +89,12 @@ const toolCategories = [
       { name: "CSV Tools", desc: "CSV converter", icon: "fa-table", href: "/tools/file/csv" },
     ],
     tools: [
-      { name: "JSON to CSV", href: "/tools/file/json-to-csv" },
-      { name: "XML to JSON", href: "/tools/file/xml-to-json" },
-      { name: "Split Excel", href: "/tools/file/split-excel" },
-      { name: "Merge Excel", href: "/tools/file/merge-excel" },
-      { name: "File Compress", href: "/tools/file/zip" },
-      { name: "All File Tools", href: "/tools/file" },
+      { name: "JSON to CSV", desc: "Convert data", icon: "fa-file-code", href: "/tools/file/json-to-csv" },
+      { name: "XML to JSON", desc: "Convert data", icon: "fa-code", href: "/tools/file/xml-to-json" },
+      { name: "Split Excel", desc: "Split sheets", icon: "fa-columns", href: "/tools/file/split-excel" },
+      { name: "Merge Excel", desc: "Combine sheets", icon: "fa-object-group", href: "/tools/file/merge-excel" },
+      { name: "File Compress", desc: "Create ZIP", icon: "fa-file-archive", href: "/tools/file/zip" },
+      { name: "All File Tools", desc: "View all tools", icon: "fa-th", href: "/tools/file" },
     ],
   },
 ];
@@ -277,14 +279,24 @@ export default function Home() {
                   </div>
 
                   {/* Other Tools */}
-                  <div className="flex flex-wrap gap-2">
+                  <div className="grid grid-cols-2 gap-4">
                     {category.tools.map((tool, idx) => (
                       <Link
                         key={idx}
                         href={tool.href}
-                        className="px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-600 hover:bg-[#6366F1] hover:text-white transition-colors"
+                        className="group p-4 rounded-2xl bg-gray-50 hover:bg-[#6366F1]/5 transition-colors border border-gray-100 hover:border-[#6366F1]/20"
                       >
-                        {tool.name}
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
+                            <i className={`fas ${tool.icon} text-[#6366F1]`}></i>
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-[#1E1B4B] group-hover:text-[#6366F1] transition-colors">
+                              {tool.name}
+                            </h4>
+                            <p className="text-xs text-gray-500 mt-1">{tool.desc}</p>
+                          </div>
+                        </div>
                       </Link>
                     ))}
                   </div>
