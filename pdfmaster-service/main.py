@@ -623,6 +623,211 @@ async def convert_image(
         )
 
 
+@app.post("/api/v1/image/rotate")
+async def rotate_image(
+    file: UploadFile = File(...),
+    angle: int = Form(90),
+):
+    """
+    Rotate image by specified angle
+
+    - **file**: Image file to rotate
+    - **angle**: Rotation angle (90, 180, 270)
+    - Returns: Rotated image
+    """
+    try:
+        logger.info(f"Rotating image: {file.filename}, angle: {angle}")
+
+        content = await file.read()
+        image = Image.open(BytesIO(content))
+
+        if angle == 90:
+            rotated = image.rotate(-90, expand=True)
+        elif angle == 180:
+            rotated = image.rotate(-180, expand=True)
+        elif angle == 270:
+            rotated = image.rotate(-270, expand=True)
+        else:
+            rotated = image.rotate(-angle, expand=True)
+
+        output_id = str(uuid.uuid4())
+        ext = image.format.lower() if image.format else "jpg"
+        output_path = os.path.join(TEMP_DIR, f"rotated_{output_id}.{ext}")
+
+        save_kwargs = {"format": image.format or "JPEG"}
+        if save_kwargs["format"] in ("JPEG", "WEBP"):
+            save_kwargs["quality"] = 95
+
+        rotated.save(output_path, **save_kwargs)
+
+        logger.info(f"Image rotated: {angle} degrees")
+
+        media_type = (
+            f"image/{image.format.lower().replace('jpeg', 'jpg')}"
+            if image.format
+            else "image/jpeg"
+        )
+
+        return FileResponse(
+            output_path,
+            filename=f"rotated_{angle}_{file.filename}",
+            media_type=media_type,
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error rotating image: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Rotation failed: {str(e)}")
+
+
+@app.post("/api/v1/image/crop")
+async def crop_image(
+    file: UploadFile = File(...),
+    x: int = Form(0),
+    y: int = Form(0),
+    width: int = Form(None),
+    height: int = Form(None),
+):
+    """
+    Crop image to specified dimensions
+
+    - **file**: Image file to crop
+    - **x**: Left position
+    - **y**: Top position
+    - **width**: Crop width
+    - **height**: Crop height
+    - Returns: Cropped image
+    """
+    try:
+        logger.info(
+            f"Cropping image: {file.filename}, x={x}, y={y}, w={width}, h={height}"
+        )
+
+        content = await file.read()
+        image = Image.open(BytesIO(content))
+
+        img_width, img_height = image.size
+        crop_width = width or img_width
+        crop_height = height or img_height
+
+        box = (x, y, x + crop_width, y + crop_height)
+        cropped = image.crop(box)
+
+        output_id = str(uuid.uuid4())
+        ext = image.format.lower() if image.format else "jpg"
+        output_path = os.path.join(TEMP_DIR, f"cropped_{output_id}.{ext}")
+
+        save_kwargs = {"format": image.format or "JPEG"}
+        if save_kwargs["format"] in ("JPEG", "WEBP"):
+            save_kwargs["quality"] = 95
+
+        cropped.save(output_path, **save_kwargs)
+
+        logger.info(f"Image cropped")
+
+        media_type = (
+            f"image/{image.format.lower().replace('jpeg', 'jpg')}"
+            if image.format
+            else "image/jpeg"
+        )
+
+        return FileResponse(
+            output_path,
+            filename=f"cropped_{file.filename}",
+            media_type=media_type,
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error cropping image: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Crop failed: {str(e)}")
+
+
+@app.post("/api/v1/image/watermark")
+async def watermark_image(
+    file: UploadFile = File(...),
+    text: str = Form(""),
+    position: str = Form("center"),
+):
+    """
+    Add watermark text to image
+
+    - **file**: Image file
+    - **text**: Watermark text
+    - **position**: Position (center, bottom-right, top-right)
+    - Returns: Image with watermark
+    """
+    try:
+        from PIL import ImageDraw, ImageFont
+
+        logger.info(f"Adding watermark to image: {file.filename}, text: {text}")
+
+        content = await file.read()
+        image = Image.open(BytesIO(content))
+
+        draw = ImageDraw.Draw(image)
+
+        try:
+            font = ImageFont.truetype(
+                "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36
+            )
+        except:
+            font = ImageFont.load_default()
+
+        bbox = draw.textbbox((0, 0), text, font=font)
+        text_width = bbox[2] - bbox[0]
+        text_height = bbox[3] - bbox[1]
+
+        img_width, img_height = image.size
+
+        if position == "center":
+            x = (img_width - text_width) // 2
+            y = (img_height - text_height) // 2
+        elif position == "bottom-right":
+            x = img_width - text_width - 20
+            y = img_height - text_height - 20
+        elif position == "top-right":
+            x = img_width - text_width - 20
+            y = 20
+        else:
+            x = 20
+            y = img_height - text_height - 20
+
+        draw.text((x, y), text, fill=(255, 255, 255, 128), font=font)
+
+        output_id = str(uuid.uuid4())
+        ext = image.format.lower() if image.format else "jpg"
+        output_path = os.path.join(TEMP_DIR, f"watermarked_{output_id}.{ext}")
+
+        save_kwargs = {"format": image.format or "JPEG"}
+        if save_kwargs["format"] in ("JPEG", "WEBP"):
+            save_kwargs["quality"] = 95
+
+        image.save(output_path, **save_kwargs)
+
+        logger.info(f"Watermark added")
+
+        media_type = (
+            f"image/{image.format.lower().replace('jpeg', 'jpg')}"
+            if image.format
+            else "image/jpeg"
+        )
+
+        return FileResponse(
+            output_path,
+            filename=f"watermarked_{file.filename}",
+            media_type=media_type,
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error adding watermark: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Watermark failed: {str(e)}")
+
+
 @app.post("/api/v1/pdf/to-jpg")
 async def pdf_to_jpg(
     file: UploadFile = File(...),

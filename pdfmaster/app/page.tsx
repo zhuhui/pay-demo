@@ -27,8 +27,6 @@ const toolCategories = [
       { name: "JPG to PDF", desc: "Images to PDF", icon: "fa-file-pdf", href: "/tools/pdf/from-jpg" },
       { name: "PDF to Excel", desc: "Convert to spreadsheet", icon: "fa-file-excel", href: "/tools/pdf/to-excel" },
       { name: "PDF to PPT", desc: "Convert to slides", icon: "fa-file-powerpoint", href: "/tools/pdf/to-ppt" },
-      { name: "Protect PDF", desc: "Add password", icon: "fa-lock", href: "/tools/pdf/protect" },
-      { name: "Unlock PDF", desc: "Remove password", icon: "fa-unlock", href: "/tools/pdf/unlock" },
     ],
   },
   {
@@ -43,6 +41,8 @@ const toolCategories = [
       { name: "Resize Image", desc: "Change dimensions", icon: "fa-expand", href: "/tools/image/resize" },
       { name: "Convert Image", desc: "Change format", icon: "fa-exchange-alt", href: "/tools/image/convert" },
       { name: "Crop Image", desc: "Crop to size", icon: "fa-crop", href: "/tools/image/crop" },
+      { name: "Rotate Image", desc: "Rotate & flip", icon: "fa-redo", href: "/tools/image/rotate" },
+      { name: "Add Watermark", desc: "Text watermark", icon: "fa-tint", href: "/tools/image/watermark" },
     ],
     tools: [
       { name: "Remove Background", desc: "AI background removal", icon: "fa-magic", href: "/tools/image/remove-bg" },
